@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import {createServer} from "http";
+import Session from "./api";
 
 const httpServer = createServer();
 
@@ -9,9 +10,10 @@ const io = new Server(httpServer, {
 
 io.on('connection', (socket) => {
     console.log("LOG: Connected!", socket.id);
-    socket.on('message', (text) => {
-        console.log("You said: ", text);
-        io.emit('return', "Received message!");
+    socket.on('message', (code) => {
+        console.log("You said: ", code);
+        new Session(socket, code);
+        //io.emit('return', "Received code!");
     })
 });
 
