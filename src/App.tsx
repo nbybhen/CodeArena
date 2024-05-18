@@ -1,7 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
-import './App.css';
 import {io} from "socket.io-client";
+import './App.css';
 import { XTerm } from 'xterm-for-react'
+import {FitAddon} from 'xterm-addon-fit';
 
 import { Editor } from '@monaco-editor/react';
 
@@ -10,6 +11,7 @@ export default function App() {
     let editorRef = useRef(null);
     let [input, setInput] = useState<string>("");
     //let [entries, setEntries] = useState([]);
+    const fitAddon = new FitAddon();
 
     const socket = io('ws://localhost:4000');
 
@@ -22,13 +24,14 @@ export default function App() {
         try {
             let msg = JSON.parse(event);
             console.log("Parsed message!", msg.message);
+            xTermRef.current.terminal.clear();
             xTermRef.current.terminal.write(msg.output);
         } catch(err) {
             console.log("Malformed message from terminal: ", event.data);
             return;
         }
 
-    })
+    });
 
     function linkEditor(editor, monaco) {
         editorRef.current = editor;
@@ -44,40 +47,45 @@ export default function App() {
         console.log("input charcode: ", input.charCodeAt(0));
         }, [input, xTermRef]);
 
+
     return (
         <div className="App">
             <header className="App-header">
-                <div style={{"marginBottom": "50px"}}>
-                    <Editor height={"20vh"} width={"45vw"}
-                            defaultLanguage={"python3"}
-                            defaultValue={"print(1+1);"}
-                            onMount={linkEditor}
-                    />
-                    <button style={{width: "50px", height: "20px"}} onClick={handleClick}>Run</button>
-                </div>
-                <XTerm ref={xTermRef}
-                       onData={(data: string) => {
-                           setInput(data);
-                           xTermRef.current.terminal.write(data);
-                       }}
-                       onKey={(event: { domEvent: { key: string; }; }) => {
-                           if(event.domEvent.key === "Backspace") {
-                               if(input) {
-                                   //console.log("Input: ",input,"\nLength: ",input.length);
-                                   //setInput(input.slice(0, input.length - 1));
-                                   xTermRef.current.terminal.write("\b \b");
-                               }
-                           }
-                           if(event.domEvent.key === "Enter") {
-                               if(input) {
-                                  // setEntries(oldArray => [...oldArray, input]);
-                                   xTermRef.current.terminal.write("\r\n");
-                               }
-                           }
-                       }}
+                <div style={{"marginBottom": "50px", display: "flex"}}>
+                    <div style={{"marginRight": "20px"}}>
+                        <Editor height={"100vh"} width={"50vw"}
+                                defaultLanguage={"python"}
+                                defaultValue={"print(1+1);"}
+                                onMount={linkEditor}
+                        />
+                    </div>
 
-                />
-                <div id="terminal"></div>
+                    <div className={"terminal"}>
+                        <XTerm ref={xTermRef}
+                               addons={[fitAddon]}
+                               onData={(data: string) => {
+                                   setInput(data);
+                                   xTermRef.current.terminal.write(data);
+                               }}
+                               onKey={(event: { domEvent: { key: string; }; }) => {
+                                   if(event.domEvent.key === "Backspace") {
+                                       if(input) {
+                                           xTermRef.current.terminal.write("\b \b");
+                                       }
+                                   }
+                                   if(event.domEvent.key === "Enter") {
+                                       if(input) {
+                                           // setEntries(oldArray => [...oldArray, input]);
+                                           xTermRef.current.terminal.write("\r\n");
+                                       }
+                                   }
+                               }}/>
+                        <button style={{width: "50px", height: "20px"}} onClick={handleClick}>Run</button>
+                    </div>
+
+
+
+                </div>
             </header>
         </div>
     );
