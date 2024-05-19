@@ -12,8 +12,8 @@ io.on('connection', (socket) => {
     console.log("LOG: Connected!", socket.id);
     socket.on('message', (code) => {
         console.log("You said: ", code);
-        new Session(socket, code);
-        //io.emit('return', "Received code!");
+        new Session(socket, code.code, code.lang);
+        io.emit('return', "Received code!");
     })
 });
 

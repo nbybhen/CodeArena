@@ -11,6 +11,8 @@ export default function App() {
     let editorRef = useRef(null);
     let [input, setInput] = useState<string>("");
     //let [entries, setEntries] = useState([]);
+    const [selectedValue, setSelectedValue] = useState("python");
+
     const fitAddon = new FitAddon();
 
     const socket = io('ws://localhost:4000');
@@ -30,8 +32,11 @@ export default function App() {
             console.log("Malformed message from terminal: ", event.data);
             return;
         }
-
     });
+
+    function handleChange(event: any) {
+        setSelectedValue(event.target.value);
+    }
 
     function linkEditor(editor, monaco) {
         editorRef.current = editor;
@@ -39,7 +44,7 @@ export default function App() {
 
     function handleClick() {
         console.log("Button clicked!");
-        socket.emit('message', editorRef.current.getValue());
+        socket.emit('message', {lang: selectedValue, code: editorRef.current.getValue()});
     }
 
         useEffect(() => {
@@ -54,7 +59,7 @@ export default function App() {
                 <div style={{"marginBottom": "50px", display: "flex"}}>
                     <div style={{"marginRight": "20px"}}>
                         <Editor height={"100vh"} width={"50vw"}
-                                defaultLanguage={"python"}
+                                language={selectedValue}
                                 defaultValue={"print(1+1);"}
                                 onMount={linkEditor}
                         />
@@ -81,6 +86,12 @@ export default function App() {
                                    }
                                }}/>
                         <button style={{width: "50px", height: "20px"}} onClick={handleClick}>Run</button>
+                        <select value={selectedValue} onChange={handleChange} name="languages" id="languages">
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="rust">Rust</option>
+                        </select>
+
                     </div>
 
 
