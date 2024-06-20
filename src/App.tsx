@@ -10,7 +10,6 @@ export default function App() {
   let xTermRef = useRef(null);
   let editorRef = useRef(null);
   let [input, setInput] = useState<string>("");
-  //let [entries, setEntries] = useState([]);
   const [selectedValue, setSelectedValue] = useState({ name: "python", default: "print(1+1)" });
 
   const fitAddon = new FitAddon();
@@ -39,12 +38,21 @@ export default function App() {
       case "python":
         setSelectedValue({ name: event.target.value, default: "print(1+1)" });
         break;
+      case "cpp":
+        setSelectedValue({
+          name: event.target.value,
+          default: `#include <iostream> 
+int main() {
+  std::cout << "Hello World!" << endl;
+}`,
+        });
+        break;
       case "rust":
         setSelectedValue({
           name: event.target.value,
           default: `fn main() {
-              println!("{}", 1+1);
-            }`,
+  println!("{}", 1+1);
+}`,
         });
         break;
       case "javascript":
@@ -107,6 +115,7 @@ export default function App() {
               <option value="python">Python</option>
               <option value="javascript">JavaScript</option>
               <option value="rust">Rust</option>
+              <option value="cpp">C++</option>
             </select>
           </div>
         </div>
