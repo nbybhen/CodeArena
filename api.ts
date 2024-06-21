@@ -16,17 +16,29 @@ let lang = {
         ext: ".rs",
         isCompiled: true,
     },
-
+    
     javascript: {
         name: "javascript",
         cmd: "node",
         ext: ".js",
         isCompiled: false,
     },
-
+    
     typescript: {},
-
-    cpp: {},
+    
+    cpp: {
+        name: "cpp",
+        cmd: "clang++ -std=c++20 tmp/main.cpp -o tmp/main_cpp.out",
+        ext: ".cpp",
+        isCompiled: true,
+    },
+    
+    c: {
+        name: "c",
+        cmd: "gcc tmp/main.c -o tmp/main_c.out",
+        ext: ".c",
+        isCompiled: true,
+    },
 };
 
 export default class Session {
@@ -97,7 +109,8 @@ export default class Session {
                 }
 
                 // If the code errored on compilation, return the error instead of running the exe
-                if (agg.includes("&&")) {
+                // The below agg.includes() is due to oh-my-zsh and may need to be changed for Docker
+                if (agg.includes("\u001b[?2004l\r\r\n")) {
                     if (agg.includes("error")) {
                         console.log("RETURNING");
                         this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: agg }));
@@ -106,15 +119,13 @@ export default class Session {
                         agg = catch_warnings;
                     }
                 }
-                
-                agg += data;
 
-                this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: agg }));
+                agg += data;
             });
 
             this.term.onExit((exit) => {
                 console.log("Exit code: ", exit.exitCode);
-                console.log(`Aggregated Output: ${agg}`);
+                console.log(`Aggregated Output: ${JSON.stringify(agg)}`);
                 this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: agg }));
             });
         }
