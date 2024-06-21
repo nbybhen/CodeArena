@@ -41,7 +41,7 @@ export default function App() {
       case "cpp":
         setSelectedValue({
           name: event.target.value,
-          default: `#include <iostream> 
+          default: `#include <iostream>
 int main() {
   std::cout << "Hello World!" << endl;
 }`,
@@ -83,7 +83,7 @@ int main() {
       <header className="App-header">
         <div style={{ marginBottom: "50px", display: "flex" }}>
           <div style={{ marginRight: "20px" }}>
-            <Editor height={"90vh"} width={"50vw"} language={selectedValue.name} value={selectedValue.default} onMount={linkEditor} />
+            <Editor height={"90vh"} width={"50vw"} language={selectedValue.name} value={selectedValue.default} onMount={linkEditor} theme={"vs-dark"} />
           </div>
 
           <div className={"terminal"}>
