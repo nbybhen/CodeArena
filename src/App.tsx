@@ -11,31 +11,44 @@ export default function App() {
     let editorRef = useRef(null);
     let [input, setInput] = useState<string>("");
     const [selectedValue, setSelectedValue] = useState({ name: "python", default: `print("Hello Python!")` });
+    let socket = useRef(null);
 
     const fitAddon = new FitAddon();
 
-    const socket = io("ws://localhost:4000");
-
-    socket.on("return", (msg) => {
-        console.log("Server said: ", msg);
-    });
-
-    socket.on("response", (event) => {
-        console.log("TERMINAL PROCESSED!", event);
-        try {
-            let msg = JSON.parse(event);
-            console.log("Parsed message!", msg.output);
-            xTermRef.current.terminal.clear();
-            console.log(`Terminal Data: ${xTermRef.current.terminal}`);
-            if (!msg.output.endsWith("\n")) {
-                msg.output += "\r\n";
-            }
-            xTermRef.current.terminal.write(msg.output);
-        } catch (err) {
-            console.log("Malformed message from terminal: ", event.data);
-            return;
+    useEffect(() => {
+        // Socket connection should only be created once per page. When making changes during development,
+        // the page will have to be manually reloaded to ensure only one connection exists.
+        // https://socket.io/how-to/use-with-react#hot-module-reloading
+        async function connect() {
+            socket.current = io("ws://localhost:4000");
         }
-    });
+
+        connect();
+
+        socket.current.on("return", (msg: any) => {
+            console.log("Server said: ", msg);
+        });
+
+        socket.current.on("response", (event: any) => {
+            console.log("TERMINAL PROCESSED!", event);
+            try {
+                let msg = JSON.parse(event);
+                console.log("Parsed message!", msg.output);
+                xTermRef.current.terminal.clear();
+                console.log(`Terminal Data: ${xTermRef.current.terminal}`);
+                if (!msg.output.endsWith("\n")) {
+                    msg.output += "\r\n";
+                }
+                xTermRef.current.terminal.write(msg.output);
+            } catch (err) {
+                console.log("Malformed message from terminal: ", event.data);
+                return;
+            }
+        });
+
+        console.log("Input: ", input);
+        console.log("input charcode: ", input.charCodeAt(0));
+    }, [input, xTermRef, socket]);
 
     function handleChange(event: any) {
         switch (event.target.value) {
@@ -104,7 +117,7 @@ import (
 )
 
 func main() {
-    fmt.Println("Hello Go!")
+    fmt.Println("Hello Go!");
 }
 `,
                 });
@@ -124,13 +137,8 @@ func main() {
 
     function handleClick() {
         console.log("Button clicked!");
-        socket.emit("message", { lang: selectedValue.name, code: editorRef.current.getValue() });
+        socket.current.emit("message", { lang: selectedValue.name, code: editorRef.current.getValue() });
     }
-
-    useEffect(() => {
-        console.log("Input: ", input);
-        console.log("input charcode: ", input.charCodeAt(0));
-    }, [input, xTermRef]);
 
     return (
         <div className="App">
