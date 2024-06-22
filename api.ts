@@ -5,39 +5,62 @@ import * as fs from "node:fs";
 let lang = {
     python: {
         name: "python3",
-        cmd: "python3",
+        cmds: ["python3 tmp/main.py && exit"],
         ext: ".py",
-        isCompiled: false,
     },
 
     rust: {
         name: "rust",
-        cmd: "rustc tmp/main.rs -o tmp/main_rs.out",
+        cmds: ["rustc tmp/main.rs -o tmp/main.out", "tmp/main.out && exit"],
         ext: ".rs",
-        isCompiled: true,
     },
-    
+
     javascript: {
         name: "javascript",
-        cmd: "node",
+        cmds: ["node tmp/main.js && exit"],
         ext: ".js",
-        isCompiled: false,
     },
-    
-    typescript: {},
-    
+
+    typescript: {
+        name: "typescript",
+        cmds: ["npx tsx tmp/main.ts && exit"],
+        ext: ".ts",
+    },
+
     cpp: {
         name: "cpp",
-        cmd: "clang++ -std=c++20 tmp/main.cpp -o tmp/main_cpp.out",
+        cmds: ["clang++ -std=c++20 tmp/main.cpp -o tmp/main.out", "tmp/main.out && exit"],
         ext: ".cpp",
-        isCompiled: true,
     },
-    
+
     c: {
         name: "c",
-        cmd: "gcc tmp/main.c -o tmp/main_c.out",
+        cmds: ["gcc tmp/main.c -o tmp/main.out", "tmp/main.out && exit"],
         ext: ".c",
-        isCompiled: true,
+    },
+
+    kotlin: {
+        name: "kotlin",
+        cmds: ["kotlinc tmp/main.kt -include-runtime -d tmp/hello.jar", "java -jar tmp/hello.jar && exit"],
+        ext: ".kt",
+    },
+
+    java: {
+        name: "java",
+        cmds: ["javac tmp/Main.java", "java -classpath tmp Main && exit"],
+        ext: ".java",
+    },
+
+    go: {
+        name: "go",
+        cmds: ["go run tmp/main.go && exit"],
+        ext: ".go",
+    },
+
+    elixir: {
+        name: "elixir",
+        cmds: ["elixir tmp/main.exs && exit"],
+        ext: ".exs",
     },
 };
 
@@ -79,73 +102,62 @@ export default class Session {
         }
 
         try {
-            fs.writeFileSync(path + "/tmp/main" + current.ext, this.code);
+            if (current.name === "java") {
+                fs.writeFileSync(path + `/tmp/Main.java`, this.code);
+            } else {
+                fs.writeFileSync(path + "/tmp/main" + current.ext, this.code);
+            }
             console.log("Successfully written to file.");
         } catch (err) {
             console.log("ERROR WRITING TO FILE.");
+            return;
         }
 
-        if (current.isCompiled) {
-            this.term = pty.spawn("zsh", [], {
-                name: "shell",
-                cwd: process.env.PWD,
-                env: process.env,
-            });
+        this.term = pty.spawn("zsh", [], {
+            name: "zsh",
+            cwd: process.env.PWD,
+            env: process.env,
+        });
 
-            let catch_warnings = "";
+        let catch_warnings = "";
 
-            this.term.write(current.cmd + "\r");
-            this.term.write("./tmp/main_" + current.ext.substring(1) + ".out && exit\r");
+        current.cmds.forEach(
+            function (cmd: string) {
+                console.log(`Running: ${cmd}`);
+                this.term.write(cmd + "\r");
+            }.bind(this),
+        );
 
-            this.term.onData((data) => {
-                switch (current.name) {
-                    case "rust":
-                        if (data.includes("warning")) {
-                            catch_warnings += data;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-
-                // If the code errored on compilation, return the error instead of running the exe
-                // The below agg.includes() is due to oh-my-zsh and may need to be changed for Docker
-                if (agg.includes("\u001b[?2004l\r\r\n")) {
-                    if (agg.includes("error")) {
-                        console.log("RETURNING");
-                        this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: agg }));
-                        return;
-                    } else {
-                        agg = catch_warnings;
+        this.term.onData((data) => {
+            switch (current.name) {
+                case "rust":
+                    if (data.includes("warning")) {
+                        catch_warnings += data;
                     }
-                }
+                    break;
+                default:
+                    break;
+            }
 
-                agg += data;
-            });
-
-            this.term.onExit((exit) => {
-                console.log("Exit code: ", exit.exitCode);
-                console.log(`Aggregated Output: ${JSON.stringify(agg)}`);
+            // If the code errored on compilation, return the error instead of running the exe
+            // The below agg.includes() is due to oh-my-zsh and may need to be changed for Docker
+            if (agg.toLowerCase().includes("error")) {
+                console.log("RETURNING");
                 this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: agg }));
-            });
-        }
-        // Interpreted languages
-        else {
-            this.term = pty.spawn(current.cmd, ["tmp/main" + current.ext], {
-                name: "run",
-                cwd: process.env.PWD,
-                env: process.env,
-            });
+                return;
+            }
 
-            this.term.onData((data) => {
-                agg += data;
-            });
+            if (agg.includes("exit") || agg.includes("\u001b[?2004l\r\r\n")) {
+                agg = catch_warnings;
+            }
 
-            this.term.onExit((exit) => {
-                console.log("Exit code: ", exit.exitCode);
-                console.log(`Aggregated Output: ${agg}`);
-                this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: agg }));
-            });
-        }
+            agg += data;
+        });
+
+        this.term.onExit((exit) => {
+            console.log("Exit code: ", exit.exitCode);
+            console.log(`Aggregated Output: ${JSON.stringify(agg)}`);
+            this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: agg }));
+        });
     }
 }

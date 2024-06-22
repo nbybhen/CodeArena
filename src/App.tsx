@@ -10,7 +10,7 @@ export default function App() {
     let xTermRef = useRef(null);
     let editorRef = useRef(null);
     let [input, setInput] = useState<string>("");
-    const [selectedValue, setSelectedValue] = useState({ name: "python", default: "print(1+1)" });
+    const [selectedValue, setSelectedValue] = useState({ name: "python", default: `print("Hello Python!")` });
 
     const fitAddon = new FitAddon();
 
@@ -40,14 +40,14 @@ export default function App() {
     function handleChange(event: any) {
         switch (event.target.value) {
             case "python":
-                setSelectedValue({ name: event.target.value, default: "print(1+1)" });
+                setSelectedValue({ name: event.target.value, default: "print(f'Hello Python!')" });
                 break;
             case "cpp":
                 setSelectedValue({
                     name: event.target.value,
                     default: `#include <iostream>
 int main() {
-  std::cout << "Hello World!" << std::endl;
+  std::cout << "Hello C++!" << std::endl;
 }`,
                 });
                 break;
@@ -57,24 +57,63 @@ int main() {
                     default: `#include <stdio.h>
 int main() {
     //printf() displays the string inside quotation
-    printf("Hello, World!");
+    printf("Hello C!");
     return 0;
 }`,
                 });
+                break;
+            case "typescript":
+                setSelectedValue({ name: event.target.value, default: `console.log("Hello TypeScript!");` });
                 break;
             case "rust":
                 setSelectedValue({
                     name: event.target.value,
                     default: `fn main() {
-  println!("{}", 1+1);
+  println!("Hello Rust!");
+}`,
+                });
+                break;
+            case "kotlin":
+                setSelectedValue({
+                    name: event.target.value,
+                    default: `fun main() {
+    println("Hello Kotlin!");
 }`,
                 });
                 break;
             case "javascript":
-                setSelectedValue({ name: event.target.value, default: "console.log(1+1);" });
+                setSelectedValue({ name: event.target.value, default: `console.log("Hello JavaScript!")` });
+                break;
+            case "java":
+                setSelectedValue({
+                    name: event.target.value,
+                    default: `class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello Java!");
+    }
+}`,
+                });
+                break;
+            case "go":
+                setSelectedValue({
+                    name: event.target.value,
+                    default: `package main
+
+import (
+    "fmt"
+)
+
+func main() {
+    fmt.Println("Hello Go!")
+}
+`,
+                });
+                break;
+            case "elixir":
+                setSelectedValue({ name: event.target.value, default: String.raw`IO.puts("Hello Elixir!\n")` });
                 break;
             default:
-                setSelectedValue({ name: event.target.value, default: "No default implementation" });
+                setSelectedValue({ name: event.target.value, default: "No default implementation." });
                 break;
         }
     }
@@ -98,7 +137,7 @@ int main() {
             <header className="App-header">
                 <div style={{ marginBottom: "50px", display: "flex" }}>
                     <div style={{ marginRight: "20px" }}>
-                        <Editor height={"90vh"} width={"50vw"} language={selectedValue.name} value={selectedValue.default} onMount={linkEditor} theme={"vs-dark"} />
+                        <Editor height={"90vh"} width={"50vw"} options={{ fontSize: 15 }} language={selectedValue.name} value={selectedValue.default} onMount={linkEditor} theme={"vs-dark"} />
                     </div>
 
                     <div className={"terminal"}>
@@ -132,6 +171,12 @@ int main() {
                             <option value="rust">Rust</option>
                             <option value="cpp">C++</option>
                             <option value="c">C</option>
+
+                            <option value="typescript">TypeScript</option>
+                            <option value="kotlin">Kotlin</option>
+                            <option value="java">Java</option>
+                            <option value="go">Go</option>
+                            <option value="elixir">Elixir</option>
                         </select>
                     </div>
                 </div>
