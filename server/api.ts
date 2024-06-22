@@ -39,10 +39,11 @@ let lang = {
         ext: ".c",
     },
 
+    // .kts = Kotlin Script file
     kotlin: {
         name: "kotlin",
-        cmds: ["kotlinc tmp/main.kt -include-runtime -d tmp/hello.jar", "java -jar tmp/hello.jar && exit"],
-        ext: ".kt",
+        cmds: ["kotlinc -script tmp/main.kts && exit"],
+        ext: ".kts",
     },
 
     java: {

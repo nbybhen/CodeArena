@@ -4,7 +4,7 @@ import "./App.css";
 import { XTerm } from "xterm-for-react";
 import { FitAddon } from "xterm-addon-fit";
 
-import { Editor } from "@monaco-editor/react";
+import { Editor, EditorProps, MonacoDiffEditor } from "@monaco-editor/react";
 
 export default function App() {
     let xTermRef = useRef(null);
@@ -89,9 +89,7 @@ int main() {
             case "kotlin":
                 setSelectedValue({
                     name: event.target.value,
-                    default: `fun main() {
-    println("Hello Kotlin!");
-}`,
+                    default: `println("Hello Kotlin!")`,
                 });
                 break;
             case "javascript":
@@ -131,7 +129,7 @@ func main() {
         }
     }
 
-    function linkEditor(editor, monaco) {
+    function linkEditor(editor: EditorProps) {
         editorRef.current = editor;
     }
 
