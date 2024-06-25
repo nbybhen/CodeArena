@@ -155,7 +155,7 @@ export default class Session {
             agg += data;
         });
 
-        this.term.onExit((exit) => {
+        this.term.onExit((exit: any) => {
             console.log("Exit code: ", exit.exitCode);
             console.log(`Aggregated Output: ${JSON.stringify(agg)}`);
             this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: agg }));
