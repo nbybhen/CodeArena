@@ -129,7 +129,7 @@ func main() {
         }
     }
 
-    function linkEditor(editor: EditorProps) {
+    function linkEditor(editor: any) {
         editorRef.current = editor;
     }
 

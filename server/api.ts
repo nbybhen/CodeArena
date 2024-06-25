@@ -80,7 +80,8 @@ export default class Session {
     }
 
     run(): void {
-        const current = lang[this.lang];
+        // @ts-ignore
+        const current: { name: string; cmds: string[]; ext: string; } = lang[this.lang];
         console.log("Current: ", current);
 
         let path = process.env.PWD!;

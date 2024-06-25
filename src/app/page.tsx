@@ -1,6 +1,41 @@
+"use client";
 import Image from "next/image";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+    const router = useRouter();
+    const [confirmation, setConfirmation] = useState("");
+    const [user, setUser] = React.useState({
+        username: "",
+        email: "",
+        password: "",
+    });
+
+    async function handleClick(event: any) {
+        try {
+            event.preventDefault();
+            setIsLoading(true);
+            const response = await axios.post("/api/users/signup", user);
+            console.log("Sign-up successful!", response.data);
+            router.push("/login");
+        } catch (err: any) {
+            console.log("Error signing up!", err.response.data);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const [buttonDisabled, setButtonDisabled] = React.useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (user.email.length > 0 && user.username.length > 0 && user.password.length > 0) {
+            setButtonDisabled(false);
+        }
+    }, [user]);
+
     return (
         <section className="bg-white dark:bg-gray-900">
             <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
@@ -19,28 +54,16 @@ export default function Home() {
                         <p className="mt-4 leading-relaxed text-gray-500 dark:text-gray-400">More information about the web application.</p>
 
                         <form action="#" className="mt-8 grid grid-cols-6 gap-6">
-                            <div className="col-span-6 sm:col-span-3">
-                                <label htmlFor="FirstName" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                                    First Name
+                            <div className="col-span-6">
+                                <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+                                    Username
                                 </label>
 
                                 <input
                                     type="text"
-                                    id="FirstName"
-                                    name="first_name"
-                                    className="mt-1 w-full size-9 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
-                                />
-                            </div>
-
-                            <div className="col-span-6 sm:col-span-3">
-                                <label htmlFor="LastName" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
-                                    Last Name
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="LastName"
-                                    name="last_name"
+                                    id="username"
+                                    name="user_name"
+                                    onChange={(e) => setUser({ ...user, username: e.target.value })}
                                     className="mt-1 w-full size-9 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                                 />
                             </div>
@@ -54,6 +77,7 @@ export default function Home() {
                                     type="email"
                                     id="Email"
                                     name="email"
+                                    onChange={(e) => setUser({ ...user, email: e.target.value })}
                                     className="mt-1 w-full size-9 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                                 />
                             </div>
@@ -67,6 +91,7 @@ export default function Home() {
                                     type="password"
                                     id="Password"
                                     name="password"
+                                    onChange={(e) => setUser({ ...user, password: e.target.value })}
                                     className="mt-1 w-full size-9 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                                 />
                             </div>
@@ -80,6 +105,7 @@ export default function Home() {
                                     type="password"
                                     id="PasswordConfirmation"
                                     name="password_confirmation"
+                                    onChange={(e) => setConfirmation((old) => old + e.target.value)}
                                     className="mt-1 w-full size-9 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                                 />
                             </div>
@@ -99,8 +125,12 @@ export default function Home() {
                             </div>
 
                             <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                                <button className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500 dark:hover:bg-blue-700 dark:hover:text-white">
-                                    Create an account
+                                <button
+                                    disabled={buttonDisabled}
+                                    onClick={handleClick}
+                                    className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500 dark:hover:bg-blue-700 dark:hover:text-white"
+                                >
+                                    {isLoading ? "Processing..." : "Create an account"}
                                 </button>
 
                                 <p className="mt-4 text-sm text-gray-500 sm:mt-0 dark:text-gray-400">

@@ -1,4 +1,31 @@
+"use client";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+
 export default function Login() {
+    const [isLoading, setIsLoading] = useState(false);
+    const [user, setUser] = useState({
+        email: "",
+        password: "",
+    });
+
+    const router = useRouter();
+
+    async function handleChange(event: any) {
+        event.preventDefault();
+        setIsLoading(true);
+        try {
+            const response = await axios.post("/api/users/login", user);
+            console.log("Login success!", response.data);
+            router.push("/dashboard");
+        } catch (err: any) {
+            console.log("Error signing in:", err.response.data);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     return (
         <section className="bg-white dark:bg-gray-900">
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
@@ -14,6 +41,7 @@ export default function Login() {
                                     type="email"
                                     name="email"
                                     id="email"
+                                    onChange={(e) => setUser({ ...user, email: e.target.value })}
                                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     placeholder="name@company.com"
                                     required={true}
@@ -27,6 +55,7 @@ export default function Login() {
                                     type="password"
                                     name="password"
                                     id="password"
+                                    onChange={(e) => setUser({ ...user, password: e.target.value })}
                                     placeholder="••••••••"
                                     className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     required={true}
@@ -55,9 +84,10 @@ export default function Login() {
                             </div>
                             <button
                                 type="submit"
+                                onClick={handleChange}
                                 className="w-full border-blue-600 bg-blue-600 px-12 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm  py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                             >
-                                Sign in
+                                {isLoading ? "Signing in..." : "Sign in"}
                             </button>
                             <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                                 Don’t have an account yet?{" "}
