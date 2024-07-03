@@ -1,9 +1,6 @@
-import { connect } from "@/db-config/db-config";
-import User from "@/models/user-model";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-
-connect();
+import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: NextRequest) {
     try {
@@ -11,36 +8,42 @@ export async function POST(request: NextRequest) {
         const { email, password } = reqBody;
         console.log("reqBody:", reqBody);
 
-        // Check if user exists
-        const user = await User.findOne({ email });
-        console.log("User: ", user);
+        const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!);
 
-        if (!user) {
+        // Check if user exists
+        const {data, error} = await supabase.from('users').select('*').eq('email', email);
+        console.log("User: ", data);
+
+        if (!data) {
+            //@ts-ignore
             return NextResponse.json({ error: "User does not exist." }, { status: 400 });
         }
 
     
-        if (!(password === user.password)) {
+        if (!(password === data[0].password)) {
+            //@ts-ignore
             return NextResponse.json({ error: "Incorrect password." }, { status: 400 });
         }
 
         // Creates token data
         const tokenData = {
-            id: user._id,
-            username: user.username,
-            email: user.email,
+            id: data[0].id,
+            username: data[0].username,
+            email: data[0].email,
         };
 
         const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, { expiresIn: "1hr" });
 
         const response = NextResponse.json({ message: "Login successful.", success: true });
 
+        //@ts-ignore
         response.cookies.set("token", token, {
             httpOnly: true,
         });
 
         return response;
     } catch (err: any) {
+        //@ts-ignore
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }

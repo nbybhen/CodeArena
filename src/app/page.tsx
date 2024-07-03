@@ -3,6 +3,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import toast, {Toaster} from "react-hot-toast";
 
 export default function Home() {
     const router = useRouter();
@@ -19,9 +20,11 @@ export default function Home() {
             setIsLoading(true);
             const response = await axios.post("/api/users/signup", user);
             console.log("Sign-up successful!", response.data);
+            toast.success("Sign-up successful!");
             router.push("/login");
         } catch (err: any) {
             console.log("Error signing up!", err.response.data);
+            toast.error(err.response.data.error);
         } finally {
             setIsLoading(false);
         }
@@ -38,6 +41,7 @@ export default function Home() {
 
     return (
         <section className="bg-white dark:bg-gray-900">
+            <Toaster position={"top-center"} />
             <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
                 <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
                     <img
@@ -136,7 +140,7 @@ export default function Home() {
                                 <p className="mt-4 text-sm text-gray-500 sm:mt-0 dark:text-gray-400">
                                     Already have an account?{" "}
                                     <a href="/login" className="text-gray-700 underline dark:text-gray-200">
-                                        Log in
+                                        Sign in
                                     </a>
                                     .
                                 </p>

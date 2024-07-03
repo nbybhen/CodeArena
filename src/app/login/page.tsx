@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import toast, {Toaster} from "react-hot-toast";
 
 export default function Login() {
     const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +21,8 @@ export default function Login() {
             console.log("Login success!", response.data);
             router.push("/dashboard");
         } catch (err: any) {
-            console.log("Error signing in:", err.response.data);
+            console.log("Error signing in:", err.response.data.error);
+            toast.error(err.response.data.error)
         } finally {
             setIsLoading(false);
         }
@@ -28,6 +30,7 @@ export default function Login() {
 
     return (
         <section className="bg-white dark:bg-gray-900">
+            <Toaster position={"top-center"} />
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
                 <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                     <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
