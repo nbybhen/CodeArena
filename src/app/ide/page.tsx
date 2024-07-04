@@ -1,25 +1,41 @@
+"use client";
+import "./App.css";
 import React, { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
-import "./App.css";
 import { XTerm } from "xterm-for-react";
-import { FitAddon } from "xterm-addon-fit";
-
 import { Editor, EditorProps, MonacoDiffEditor } from "@monaco-editor/react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import toast, {Toaster} from "react-hot-toast";
 
-export default function App() {
+export default function Dashboard() {
     let xTermRef = useRef(null);
     let editorRef = useRef(null);
     let [input, setInput] = useState<string>("");
     const [selectedValue, setSelectedValue] = useState({ name: "python", default: `print("Hello Python!")` });
     let socket = useRef(null);
 
-    const fitAddon = new FitAddon();
+    const router = useRouter();
+
+    async function logout(event: any) {
+        event.preventDefault();
+        try {
+            let response = axios.get("/api/users/logout");
+            console.log("Logged out successfully!", response);
+            toast.success("Logged out successfully!");
+            router.push("/login");
+        } catch (err) {
+            toast.error(err.message);
+            console.log("Error logging out", err.message);
+        }
+    }
 
     useEffect(() => {
         // Socket connection should only be created once per page. When making changes during development,
         // the page will have to be manually reloaded to ensure only one connection exists.
         // https://socket.io/how-to/use-with-react#hot-module-reloading
         async function connect() {
+            //@ts-ignore
             socket.current = io("ws://localhost:4000");
         }
 
@@ -31,6 +47,7 @@ export default function App() {
 
         socket.current.on("response", (event: any) => {
             console.log("TERMINAL PROCESSED!", event);
+
             try {
                 let msg = JSON.parse(event);
                 console.log("Parsed message!", msg.output);
@@ -42,12 +59,13 @@ export default function App() {
                 xTermRef.current.terminal.write(msg.output);
             } catch (err) {
                 console.log("Malformed message from terminal: ", event.data);
+                console.log(err);
                 return;
             }
         });
 
-        console.log("Input: ", input);
-        console.log("input charcode: ", input.charCodeAt(0));
+        // console.log("Input: ", input);
+        // console.log("input charcode: ", input.charCodeAt(0));
     }, [input, xTermRef, socket]);
 
     function handleChange(event: any) {
@@ -140,6 +158,7 @@ func main() {
 
     return (
         <div className="App">
+            <Toaster position={"top-center"} />
             <header className="App-header">
                 <div style={{ marginBottom: "50px", display: "flex" }}>
                     <div style={{ marginRight: "20px" }}>
@@ -149,9 +168,9 @@ func main() {
                     <div className={"terminal"}>
                         <XTerm
                             ref={xTermRef}
-                            addons={[fitAddon]}
                             onData={(data: string) => {
                                 setInput(data);
+                                console.log(`data: ${data}`);
                                 xTermRef.current.terminal.write(data);
                             }}
                             onKey={(event: { domEvent: { key: string } }) => {
@@ -162,16 +181,12 @@ func main() {
                                 }
                                 if (event.domEvent.key === "Enter") {
                                     if (input) {
-                                        // setEntries(oldArray => [...oldArray, input]);
                                         xTermRef.current.terminal.write("\r\n");
                                     }
                                 }
                             }}
                         />
-                        <button style={{ width: "50px", height: "20px" }} onClick={handleClick}>
-                            Run
-                        </button>
-                        <select value={selectedValue.name} onChange={handleChange} name="languages" id="languages">
+                        <select className="text-lg" value={selectedValue.name} onChange={handleChange} name="languages" id="languages">
                             <option value="python">Python</option>
                             <option value="javascript">JavaScript</option>
                             <option value="rust">Rust</option>
@@ -184,8 +199,20 @@ func main() {
                             <option value="go">Go</option>
                             <option value="elixir">Elixir</option>
                         </select>
+                        <button
+                            className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-5 text-lg text-white transition hover:bg-transparent hover:text-blue-600  active:text-blue-500 dark:hover:bg-blue-700 dark:hover:text-white"
+                            onClick={handleClick}
+                        >
+                            Run
+                        </button>
                     </div>
                 </div>
+                <button
+                    className="inline-block shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-3 textarea-md font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500 dark:hover:bg-blue-700 dark:hover:text-white"
+                    onClick={logout}
+                >
+                    Log Out
+                </button>
             </header>
         </div>
     );

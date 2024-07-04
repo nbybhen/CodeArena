@@ -19,7 +19,7 @@ export default function Login() {
         try {
             const response = await axios.post("/api/users/login", user);
             console.log("Login success!", response.data);
-            router.push("/dashboard");
+            router.push("/home");
         } catch (err: any) {
             console.log("Error signing in:", err.response.data.error);
             toast.error(err.response.data.error)
