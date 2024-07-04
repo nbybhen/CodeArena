@@ -8,7 +8,14 @@ const config: Config = {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
                 "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
             },
+            colors: {
+                transparent: 'transparent',
+                current: 'currentColor',
+                primary: '#0e0e11',
+                secondary: '#18181b'
+            }
         },
+
     },
     plugins: [require("daisyui")],
 };

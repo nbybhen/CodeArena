@@ -3,7 +3,7 @@ import Card from "@/components/card";
 
 export default function Home() {
     return (
-        <div className={"flex h-screen w-screen dark:bg-gray-900"}>
+        <div className={"flex h-screen w-screen bg-primary"}>
             <div className={"float-left"}>
                 <SideBar />
             </div>

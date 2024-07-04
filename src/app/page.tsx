@@ -40,7 +40,7 @@ export default function Home() {
     }, [user]);
 
     return (
-        <section className="bg-white dark:bg-gray-900">
+        <section className="bg-primary">
             <Toaster position={"top-center"} />
             <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
                 <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
@@ -68,7 +68,7 @@ export default function Home() {
                                     id="username"
                                     name="user_name"
                                     onChange={(e) => setUser({ ...user, username: e.target.value })}
-                                    className="mt-1 w-full size-9 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                                    className="mt-1 w-full size-9 rounded-md border-gray-200 text-sm text-gray-700 shadow-sm bg-secondary dark:text-gray-200"
                                 />
                             </div>
 
@@ -82,7 +82,7 @@ export default function Home() {
                                     id="Email"
                                     name="email"
                                     onChange={(e) => setUser({ ...user, email: e.target.value })}
-                                    className="mt-1 w-full size-9 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                                    className="mt-1 w-full size-9 rounded-md border-gray-200 text-sm bg-secondary text-gray-700 shadow-sm dark:text-gray-200"
                                 />
                             </div>
 
@@ -96,7 +96,7 @@ export default function Home() {
                                     id="Password"
                                     name="password"
                                     onChange={(e) => setUser({ ...user, password: e.target.value })}
-                                    className="mt-1 w-full size-9 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                                    className="mt-1 w-full size-9 rounded-md border-gray-200 text-sm text-gray-700 bg-secondary shadow-sm dark:text-gray-200"
                                 />
                             </div>
 
@@ -110,7 +110,7 @@ export default function Home() {
                                     id="PasswordConfirmation"
                                     name="password_confirmation"
                                     onChange={(e) => setConfirmation((old) => old + e.target.value)}
-                                    className="mt-1 w-full size-9 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                                    className="mt-1 w-full size-9 rounded-md bg-secondary border-gray-200 text-sm text-gray-700 shadow-sm dark:border-gray-700  dark:text-gray-200"
                                 />
                             </div>
 
