@@ -1,5 +1,5 @@
 import SideBar from "@/components/side-bar";
-import Card from "@/components/card";
+import ArenaModeCard from "@/components/arena-mode-card";
 
 export default function Home() {
     return (
@@ -11,12 +11,12 @@ export default function Home() {
                 <h2 className={"text-2xl font-bold mt-10"}>Select an Arena:</h2>
                 <div className={"flex mt-3"}>
                     <div className={"mr-2"}>
-                        <Card name={"Solo"} desc={"Sharpen your programming skills before entering the arena!"} />
+                        <ArenaModeCard name={"Solo"} desc={"Sharpen your programming skills before entering the arena!"} path={"/solo"} />
                     </div>
                     <div className={"mr-2"}>
-                        <Card name={"Clash"} desc={"Clash with fellow coders in a real-time game!"} />
+                        <ArenaModeCard name={"Clash"} desc={"Clash with fellow coders in a real-time game!"} path={"/clash"} />
                     </div>
-                    <Card name={"Cooperate"} desc={"Fight against the clock with an ally to complete a problem!"} />
+                    <ArenaModeCard name={"Cooperate"} desc={"Fight against the clock with an ally to complete a problem!"} path={"/co-op"} />
                 </div>
 
             </div>

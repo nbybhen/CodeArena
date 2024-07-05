@@ -3,8 +3,19 @@ import Link from "next/link";
 import axios from "axios";
 import toast from "react-hot-toast";
 import {useRouter} from "next/navigation";
+import {useEffect} from "react";
+import {createClient} from "@supabase/supabase-js";
 
 export default function SideBar() {
+
+    useEffect(() => {
+        try {
+            const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!);
+            const {data, err} = supabase.from('users').select('username').eq('username', )
+        } catch (e) {
+
+        }
+    }, []);
 
     const router = useRouter();
 

@@ -7,6 +7,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast, {Toaster} from "react-hot-toast";
 import SideBar from "@/components/side-bar";
+import Head from "next/head";
 
 export default function Dashboard() {
     let xTermRef = useRef(null);

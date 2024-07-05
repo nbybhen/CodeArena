@@ -60,7 +60,7 @@ export default function Login() {
                                     id="password"
                                     onChange={(e) => setUser({ ...user, password: e.target.value })}
                                     placeholder="••••••••"
-                                    className="bg-secondary border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5"
+                                    className="border border-gray-300 text-gray-900 bg-secondary rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                     required={true}
                                 />
                             </div>
@@ -81,7 +81,7 @@ export default function Login() {
                                         </label>
                                     </div>
                                 </div>
-                                <a href="#" className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">
+                                <a href="#" className="text-sm  font-medium text-primary-600 hover:underline dark:text-primary-500">
                                     Forgot password?
                                 </a>
                             </div>
