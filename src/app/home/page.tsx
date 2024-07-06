@@ -7,7 +7,7 @@ export default function Home() {
             <div className={"float-left"}>
                 <SideBar />
             </div>
-            <div className={"flex flex-col items-center m-2 w-screen"}>
+            <div className={"flex flex-col items-center ml-[200px] m-2 w-screen"}>
                 <h2 className={"text-2xl font-bold mt-10"}>Select an Arena:</h2>
                 <div className={"flex mt-3"}>
                     <div className={"mr-2"}>

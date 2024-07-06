@@ -34,8 +34,8 @@ export default function SideBar() {
 
     return (
         <header>
-            <aside id="separator-sidebar" className="top-0 left-0 z-40 w-full h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-        <div className="h-screen px-3 py-4 overflow-y-auto bg-gray-50 bg-secondary">
+            <aside id="separator-sidebar" className="top-0 fixed left-0 border border-gray-700 z-40 w-[200px] h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+        <div className="h-screen px-3 py-4 overflow-y-auto bg-secondary">
             <ul className="space-y-2 font-medium">
                 <li className={"font-bold text-xl"}>
                     CodeArena

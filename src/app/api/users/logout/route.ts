@@ -16,7 +16,6 @@ export async function GET() {
         
         return response;
     } catch (err: any) {
-        //@ts-ignore
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        return NextResponse.json({ error: err.message, status: 500});
     }
 }
