@@ -1,5 +1,3 @@
-import { connect } from "@/db-config/db-config";
-import User from "@/models/user-model";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
