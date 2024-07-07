@@ -29,13 +29,19 @@ const db_questions: ({
         diff: "Novice",
         solution: {
             rust: endent`fn hello_world_sol() -> &'static str {
-                return "Hello World!";
-            }`
+                            "Hello World!"
+                         }`
         },
         tests: {
-            rust: endent`fn main() {
-                assert_eq!(hello_world_sol(), hello_world());
-            }
+            rust: endent`#[cfg(test)]
+                        mod tests {
+                            use super::*;
+                        
+                            #[test]
+                            fn basic_test() {
+                                assert_eq!(hello_world(), hello_world_sol());
+                            }
+                        }
             `
         },
         starter: {

@@ -1,18 +1,20 @@
 "use client";
 import SideBar from "@/components/side-bar";
 import React, {useEffect, useRef, useState} from "react";
-import {usePathname} from "next/navigation";
+import {usePathname, useRouter} from "next/navigation";
 import db_questions from "@/fake-db";
 import { Editor } from "@monaco-editor/react";
 import { io } from "socket.io-client";
 import stripAnsi from "strip-ansi";
+import toast from "react-hot-toast";
 
 
 
 export default function SoloQuestion(){
-    const router = usePathname();
+    const pathname = usePathname();
+    const router = useRouter();
     const question = db_questions.filter((q) => {
-        return q.id == router.split('/').at(-1);
+        return q.id == pathname.split('/').at(-1);
     })[0];
 
     let editorRef = useRef(null);
@@ -24,8 +26,9 @@ export default function SoloQuestion(){
     let socket = useRef(null);
 
     useEffect(() => {
-        console.log("Route: ", router.split('/').at(-1));
-        console.log(question);
+        const id = pathname.split('/').at(-1);
+        console.log("Route: ", id);
+        //console.log(question);
 
         // Socket connection should only be created once per page. When making changes during development,
         // the page will have to be manually reloaded to ensure only one connection exists.
@@ -49,6 +52,13 @@ export default function SoloQuestion(){
                 console.log("Parsed message!", msg.output);
                 if (!msg.output.endsWith("\n")) {
                     msg.output += "\r\n";
+                }
+                console.log("Exit code: ", msg.code)
+                if(msg.code === 0) {
+                    console.log("FINISHED QUESTION!");
+                    toast.success("Question Completed!");
+                    router.push(`/solo/${id}/complete`);
+                    return;
                 }
                 setOutput(stripAnsi(msg.output));
                 console.log("New output: ",output);
@@ -89,13 +99,13 @@ export default function SoloQuestion(){
     return (
         <div className={"flex bg-primary"}>
             <SideBar/>
-            <div className={"flex flex-col border-2 w-screen h-screen ml-[200px]"}>
+            <div className={"flex flex-col w-screen h-screen ml-[200px]"}>
                 <div className={"flex"}>
-                    <div className={"flex flex-col w-3/4 border border-red-600"}>
+                    <div className={"flex flex-col w-3/4 mb-10"}>
                         <h5 className={"text-2xl font-bold"}>{question.title}</h5>
                         <p className={""}>{question.desc}</p>
                     </div>
-                    <div className={"border-2 border-pink-500 w-1/4 flex justify-center items-center"}>
+                    <div className={"w-1/4 flex justify-center items-center"}>
                         <select name="language" id="language" onChange={handleLanguageChange}>
                             {getLanguageOptions()}
                         </select>
@@ -109,7 +119,7 @@ export default function SoloQuestion(){
 
                 <div className={"flex justify-evenly"}>
                     <div>
-                        <div className={"bg-black border-2 h-[50vh] w-[40vw] break-words whitespace-pre-wrap"}>
+                        <div className={"bg-black border-2 overflow-y-auto h-[50vh] w-[40vw] break-words whitespace-pre-wrap"}>
                             <p className={"border-b text-center text-xl"}>Output</p>
                             {output}
                         </div>

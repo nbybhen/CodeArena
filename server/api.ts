@@ -12,7 +12,8 @@ let lang = {
 
     rust: {
         name: "rust",
-        cmds: ["rustc tmp/main.rs -o tmp/main.out", "tmp/main.out", "exit"],
+        //cmds: ["rustc tmp/main.rs -o tmp/main.out", "tmp/main.out", "exit"],
+        cmds: ["cd tmp/rust", "cargo test", "exit"],
         ext: ".rs",
     },
 
@@ -107,6 +108,8 @@ export default class Session {
         try {
             if (current.name === "java") {
                 fs.writeFileSync(path + `/tmp/Main.java`, this.code);
+            } else if (current.name === "rust") {
+                fs.writeFileSync(path + "/tmp/rust/src/main.rs", this.code);
             } else {
                 fs.writeFileSync(path + "/tmp/main" + current.ext, this.code);
             }
@@ -179,7 +182,7 @@ export default class Session {
 
             console.log("Exit code: ", exit.exitCode);
             console.log(`Aggregated Output: ${JSON.stringify(newAgg)}`);
-            this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: newAgg }));
+            this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: newAgg, code: exit.exitCode }));
         });
     }
 }
