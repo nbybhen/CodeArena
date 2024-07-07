@@ -14,6 +14,10 @@ io.on('connection', (socket: any) => {
         console.log("You said: ", code);
         new Session(socket, code.code, code.lang);
         io.emit('return', "Received code!");
+    });
+
+    socket.on('solo', (code: any) => {
+
     })
 });
 

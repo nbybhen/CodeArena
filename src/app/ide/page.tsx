@@ -3,11 +3,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { XTerm } from "xterm-for-react";
 import { Editor } from "@monaco-editor/react";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import toast, {Toaster} from "react-hot-toast";
+import {Toaster} from "react-hot-toast";
 import SideBar from "@/components/side-bar";
-import Head from "next/head";
 
 export default function Dashboard() {
     let xTermRef = useRef(null);
@@ -137,7 +134,7 @@ func main() {
         }
     }
 
-    function linkEditor(editor: any) {
+    function linkEditor(editor) {
         editorRef.current = editor;
     }
 
@@ -201,8 +198,7 @@ func main() {
                                             xTermRef.current.terminal.write("\r\n");
                                         }
                                     }
-                                }}
-                            />
+                                }} />
                         </div>
                     </div>
                 </header>

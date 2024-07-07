@@ -1,6 +1,7 @@
 import * as pty from "node-pty";
 import { IPty } from "node-pty";
 import * as fs from "node:fs";
+import stripAnsi from "strip-ansi";
 
 let lang = {
     python: {
@@ -11,7 +12,7 @@ let lang = {
 
     rust: {
         name: "rust",
-        cmds: ["rustc tmp/main.rs -o tmp/main.out", "tmp/main.out && exit"],
+        cmds: ["rustc tmp/main.rs -o tmp/main.out", "tmp/main.out", "exit"],
         ext: ".rs",
     },
 
@@ -149,17 +150,36 @@ export default class Session {
                 return;
             }
 
-            if (agg.includes("exit") || agg.includes("\u001b[?2004l\r\r\n")) {
+            if ((agg.includes("\u001b[?2004l\r\r\n")) && !agg.includes("panic")) {
                 agg = catch_warnings;
             }
+
+            data = stripAnsi(data);
 
             agg += data;
         });
 
         this.term.onExit((exit: any) => {
+            let splt = agg.split('\n');
+            let newAgg = "";
+
+            splt.forEach((line) => {
+                let isIn = false;
+                current.cmds.forEach((cmd) => {
+                    if(line.includes(cmd)) {
+                        isIn = true;
+                        return;
+                    }
+                });
+
+                if(!isIn) {
+                    newAgg += (line + "\n");
+                }
+            })
+
             console.log("Exit code: ", exit.exitCode);
-            console.log(`Aggregated Output: ${JSON.stringify(agg)}`);
-            this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: agg }));
+            console.log(`Aggregated Output: ${JSON.stringify(newAgg)}`);
+            this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: newAgg }));
         });
     }
 }
