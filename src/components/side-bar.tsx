@@ -4,35 +4,47 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import {useRouter} from "next/navigation";
 import {useEffect, useState} from "react";
-import {createClient} from "@supabase/supabase-js";
 
 export default function SideBar() {
     let [username, setUsername] = useState<string>("");
     let [score, setScore] = useState<number>(0);
     let [rank, setRank] = useState<string>("");
 
-    useEffect(() => {
-        async function get() {
-            const response = await axios.get("/api/users/me");
-            console.log("Me! ",response.data.data[0]);
-            setUsername(response.data.data[0].username);
-            setScore(response.data.data[0].score);
-            setRank(response.data.data[0].ranking);
-        }
-
-        try {
-            get();
-        } catch (e) {
-
-        }
-    }, []);
-
     const router = useRouter();
 
+    useEffect(() => {
+        // An attempt at fixing error where site is rehosted and token remains since it was logged in previously,
+        // but no data is contained within it 
+        async function get() {
+            try {
+                const response = await axios.get("/api/users/me");
+                if(response.data.data) {
+                    console.log("Me! ",response.data.data[0]);
+                    setUsername(response.data.data[0].username);
+                    setScore(response.data.data[0].score);
+                    setRank(response.data.data[0].ranking);
+                }
+                else {
+                    console.log("Error! ");
+                    toast.error("Failed to find user token.");
+                    await logout("any");
+                }
+
+            } catch (e: any) {
+                console.log("Not working?");
+                
+            } 
+        }
+        
+        get();
+
+    }, []);
+
+    
     async function logout(event: any) {
         event.preventDefault();
         try {
-            let response = axios.get("/api/users/logout");
+            let response = await axios.get("/api/users/logout");
             console.log("Logged out successfully!", response);
             toast.success("Logged out successfully!");
             router.push("/login");

@@ -4,6 +4,7 @@ import QuestionCard from "@/components/question-card";
 import QuestionNav from "@/components/question-nav";
 import {useEffect, useState} from "react";
 import db_questions from "@/fake-db";
+import axios from "axios";
 
 export default function Solo() {
     let [questions, setQuestions] = useState([]);
@@ -19,24 +20,44 @@ export default function Solo() {
         console.log("Current difficulty: ",diff);
 
         setQuestions([]);
-        db_questions.forEach(dbq => {
-            console.log("ADDING QUESTION");
-            const question = <QuestionCard key={dbq.title} id={dbq.id} title={dbq.title}
-                                           desc={dbq.desc}
-                                           langs={dbq.languages}
-                                           diff={dbq.diff}/>
-            setQuestions(oldQuestions => [...oldQuestions, question]);
-        });
 
-        console.log("Questions.len", questions.length);
+        async function getQuestions() {
+            const response = await axios.get("/api/questions/get_questions");
+            console.log("Response: ", response);
 
-        function filterQuestions(question) {
-            return ( (question.props.title.toLowerCase().includes(search.toLowerCase()) || search === "")
-                && (question.props.langs.includes(language) || language === "any")
-                && (question.props.diff.toLowerCase() === diff || diff === "any"));
+            const questions = response.data.questions;
+            questions.forEach((dbq) => {
+                console.log("ADDING QUESTION");
+
+                const question = <QuestionCard key={dbq.title} id={dbq.id} title={dbq.title} 
+                desc={dbq.desc} langs={["python"]} diff={dbq.difficulty} />
+                setQuestions(oldQuestions => [...oldQuestions, question]);
+            });
+
+            console.log("Questions.len", questions.length);
+
         }
 
-        setQuestions(oldQuestions => oldQuestions.filter(filterQuestions));
+        getQuestions();
+
+        // db_questions.forEach(dbq => {
+        //     console.log("ADDING QUESTION");
+        //     const question = <QuestionCard key={dbq.title} id={dbq.id} title={dbq.title}
+        //                                    desc={dbq.desc}
+        //                                    langs={dbq.languages}
+        //                                    diff={dbq.diff}/>
+        //     setQuestions(oldQuestions => [...oldQuestions, question]);
+        // });
+
+        // console.log("Questions.len", questions.length);
+
+        // function filterQuestions(question) {
+        //     return ( (question.props.title.toLowerCase().includes(search.toLowerCase()) || search === "")
+        //         && (question.props.langs.includes(language) || language === "any")
+        //         && (question.props.diff.toLowerCase() === diff || diff === "any"));
+        // }
+
+        // setQuestions(oldQuestions => oldQuestions.filter(filterQuestions));
     }, [search, language, diff]);
 
     return(
