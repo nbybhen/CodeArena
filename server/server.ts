@@ -11,8 +11,8 @@ const io = new Server(httpServer, {
 io.on('connection', (socket: any) => {
     console.log("LOG: Connected!", socket.id);
     socket.on('message', (code: any) => {
-        console.log("You said: ", code);
-        new Session(socket, code.code, code.lang);
+        //console.log("You said: ", code);
+        new Session(socket, code.code, code.lang, code.ide);
         io.emit('return', "Received code!");
     });
 

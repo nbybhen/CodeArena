@@ -30,7 +30,9 @@ const db_questions: ({
         solution: {
             rust: endent`fn hello_world_sol() -> &'static str {
                             "Hello World!"
-                         }`
+                         }`,
+            python: endent` def hello_world_sol() -> str:
+                                return "Hello World!"`
         },
         tests: {
             rust: endent`#[cfg(test)]
@@ -42,12 +44,28 @@ const db_questions: ({
                                 assert_eq!(hello_world(), hello_world_sol());
                             }
                         }
+            `,
+            python: endent`
+                import unittest
+
+                class Testing(unittest.TestCase):
+                
+                    def test_upper(self):
+                        self.assertEqual(hello_world(), hello_world_sol())
+                
+                
+                if __name__ == '__main__':
+                    unittest.main()
             `
         },
         starter: {
             rust: endent`fn hello_world() -> &'static str {
                 // Put solution here.
-            }`
+            }`,
+            python: endent`
+            def hello_world() -> str:
+                return
+            `
         }
     },
     {

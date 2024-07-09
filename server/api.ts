@@ -72,13 +72,126 @@ export default class Session {
     socket: any;
     code: string;
     lang: string;
+    isIDE: boolean;
 
-    constructor(socket: any, code: string, lang: string) {
+    constructor(socket: any, code: string, lang: string, ide: boolean) {
         this.socket = socket;
         this.code = code;
         this.lang = lang;
+        this.isIDE = ide;
         this.term = null;
-        this.run();
+
+        if(this.isIDE) {
+            this.runIDE();
+        }
+        else {
+            this.run();
+        }
+    }
+
+    runIDE(): void {
+        // @ts-ignore
+        const current: { name: string; cmds: string[]; ext: string; } = lang[this.lang];
+        console.log("Current: ", current);
+
+        let path = process.env.PWD!;
+
+        let agg = "";
+
+        // Ensures the language chosen has a backend implemention completed.
+        if (current === undefined) {
+            this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: "This language is not implemented yet." }));
+            return;
+        }
+
+        if (this.term) {
+            this.term.kill();
+        }
+
+        // Ensures a tmp directory exists
+        if (!fs.existsSync(path + "/tmp")) {
+            fs.mkdirSync(path + "/tmp");
+        }
+
+        try {
+            if (current.name === "java") {
+                fs.writeFileSync(path + `/tmp/Main.java`, this.code);
+            } else if (current.name === "rust") {
+                fs.writeFileSync(path + "/tmp/rust/src/main.rs", this.code);
+            } else {
+                fs.writeFileSync(path + "/tmp/main" + current.ext, this.code);
+            }
+            console.log("Successfully written to file.");
+        } catch (err) {
+            console.log("ERROR WRITING TO FILE.");
+            return;
+        }
+
+        this.term = pty.spawn("zsh", [], {
+            name: "zsh",
+            cwd: process.env.PWD,
+            env: process.env,
+        });
+
+        let catch_warnings = "";
+
+        current.cmds.forEach(
+            function (cmd: string) {
+                console.log(`Running: ${cmd}`);
+                this.term.write(cmd + "\r");
+            }.bind(this),
+        );
+
+        this.term.onData((data) => {
+            switch (current.name) {
+                case "rust":
+                    if (data.includes("warning")) {
+                        catch_warnings += data;
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            // If the code errored on compilation, return the error instead of running the exe
+            // The below agg.includes() is due to oh-my-zsh and may need to be changed for Docker
+            if (agg.toLowerCase().includes("error")) {
+                console.log("RETURNING");
+                this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: agg }));
+                return;
+            }
+
+            if ((agg.includes("\u001b[?2004l\r\r\n")) && !agg.includes("panic")) {
+                agg = catch_warnings;
+            }
+
+            data = stripAnsi(data);
+
+            agg += data;
+        });
+
+        this.term.onExit((exit: any) => {
+            let splt = agg.split('\n');
+            let newAgg = "";
+
+            splt.forEach((line) => {
+                let isIn = false;
+                current.cmds.forEach((cmd) => {
+                    if(line.includes(cmd)) {
+                        isIn = true;
+                        return;
+                    }
+                });
+
+                if(!isIn) {
+                    newAgg += (line + "\n");
+                }
+            })
+
+            console.log("Exit code: ", exit.exitCode);
+            console.log(`Aggregated Output: ${JSON.stringify(newAgg)}`);
+            this.socket.emit("response", JSON.stringify({ message: "Terminal Output", output: newAgg, code: exit.exitCode }));
+        });
     }
 
     run(): void {

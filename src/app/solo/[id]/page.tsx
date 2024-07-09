@@ -80,7 +80,7 @@ export default function SoloQuestion(){
         console.log("Testing Editor: ", testingRef.current.getValue());
         let agg = question.solution[selectedValue.name] + "\n" + editorRef.current.getValue() + "\n" + testingRef.current.getValue();
         console.log("Aggregated code: ",agg);
-        socket.current.emit("message", { lang: selectedValue.name, code: agg });
+        socket.current.emit("message", { lang: selectedValue.name, code: agg, ide: false });
     }
 
     function handleLanguageChange(event) {
@@ -99,7 +99,7 @@ export default function SoloQuestion(){
     return (
         <div className={"flex bg-primary"}>
             <SideBar/>
-            <div className={"flex flex-col w-screen h-screen ml-[200px]"}>
+            <div className={"flex flex-col mt-5 w-screen h-screen ml-[200px]"}>
                 <div className={"flex"}>
                     <div className={"flex flex-col w-3/4 mb-10"}>
                         <h5 className={"text-2xl font-bold"}>{question.title}</h5>
