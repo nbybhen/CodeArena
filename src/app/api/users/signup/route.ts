@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import {createClient} from "@supabase/supabase-js";
+import supabase from "@/utils/supabase";
 
 export async function POST(request: NextRequest) {
     try {
         const reqBody = await request.json();
         const { username, email, password } = reqBody;
-        const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!);
-
-        console.log("reqBody", reqBody);
 
         // Check if users exist
         const {data, error} = await supabase.from('users').select('*').eq('email', email);
@@ -43,7 +40,6 @@ export async function POST(request: NextRequest) {
             savedUser,
         });
     } catch (err: any) {
-        //@ts-ignore
-        return NextResponse.json({ error: err.message }, { status: 500 });
+        return NextResponse.json({ error: err.message, status: 500 });
     }
 }

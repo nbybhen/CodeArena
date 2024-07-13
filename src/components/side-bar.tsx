@@ -27,11 +27,12 @@ export default function SideBar() {
                 else {
                     console.log("Error! ");
                     toast.error("Failed to find user token.");
-                    await logout("any");
+                    await logout(null);
                 }
 
             } catch (e: any) {
                 console.log("Not working?");
+                console.log("Err: ",e);
                 
             } 
         }
@@ -42,7 +43,10 @@ export default function SideBar() {
 
     
     async function logout(event: any) {
-        event.preventDefault();
+        if(event) {
+            event.preventDefault();
+        }
+
         try {
             let response = await axios.get("/api/users/logout");
             console.log("Logged out successfully!", response);
@@ -62,10 +66,10 @@ export default function SideBar() {
                 <li className={"font-bold text-xl"}>
                     CodeArena
                 </li>
-                <li>
+                <li className={"font-bold text-cyan-500"}>
                     {username} [{score}]
                 </li>
-                <li>
+                <li className={"font-bold text-cyan-500"}>
                     {rank}
                 </li>
                 <li className={"border-t dark:border-gray-700 mt-4 pt-4"}>

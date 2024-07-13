@@ -1,22 +1,24 @@
-import { createClient } from "@supabase/supabase-js";
+import supabase from "@/utils/supabase";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
     try {
-        let supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!);
+        const users = await supabase.from("users").select().limit(100);
 
-        const {data, error} = await supabase.from("question_list").select();
+        const {data, error} = await supabase.from("question_list").select().limit(100);
 
         console.log("Questions: ", data);
-        console.log("Errors: ",error);
 
-        const {lang_data, err} = await supabase.from("question_langs").select()
+        //console.log("Errors: ",error);
 
-        console.log("Languages: ", lang_data);
+        const languages = await supabase.from("question_langs").select().limit(100);
+
+        console.log("Langs Test: ", languages.data);
 
         return NextResponse.json({
             message: "Question data GET successfully!",
-            questions: data
+            questions: data,
+            langs: languages.data
         });
     } catch (err) {
         return NextResponse.json({
