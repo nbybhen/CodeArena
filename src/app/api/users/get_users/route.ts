@@ -10,8 +10,6 @@ export async function GET(){
             return NextResponse.json({error: err.message, status: 400})
         }
 
-        console.log("Users: ", data);
-
         return NextResponse.json({users: data});
     } catch (e) {
         return NextResponse.json({error: e.message, status: 400});

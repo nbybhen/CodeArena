@@ -45,6 +45,7 @@ export default function SoloQuestion(){
     let editorRef = useRef(null);
     let testingRef = useRef(null);
     let socket = useRef(null);
+    let current_language = useRef<string | null>(null);
 
     useEffect(() => {
         const id = pathname.split('/').at(-1);
@@ -82,7 +83,7 @@ export default function SoloQuestion(){
 
         async function solveQuestion() {
             try {
-                const response = await axios.post("/api/questions/solve_question");
+                await axios.post("/api/questions/solve_question", {q_id: id, solution: editorRef.current.getValue(), language: current_language.current});
 
             } catch (e) {
                 console.log("Error solving question: ", e.message);
@@ -108,6 +109,7 @@ export default function SoloQuestion(){
                 if(msg.code === 0) {
                     console.log("FINISHED QUESTION!");
                     toast.success("Question Completed!");
+                    solveQuestion();
                     setTimeout(() => {
                         router.push(`/solo/${id}/complete`);
                     }, 1000);
@@ -122,11 +124,11 @@ export default function SoloQuestion(){
             }
         });
 
-    }, []);
+    }, [current_language]);
 
     function handleClick() {
         console.log("Button clicked!");
-        console.log("SelectedValue: ", selected.language);
+        current_language.current = selected.language;
         console.log("Editor: ",editorRef.current.getValue());
         console.log("Testing Editor: ", testingRef.current.getValue());
         let agg = selected.solution + "\n" + editorRef.current.getValue() + "\n" + testingRef.current.getValue();
@@ -134,14 +136,15 @@ export default function SoloQuestion(){
         socket.current.emit("message", { lang: selected.language, code: agg, ide: false });
     }
 
-    function handleLanguageChange(event) {
+    async function handleLanguageChange(event) {
         event.preventDefault();
         let selected_lang: Lang = langs.filter((lang: Lang) => {
             return lang.language === event.target.value;
         })[0];
 
         console.log("Selected: ", selected_lang);
-        setSelected(selected_lang);
+        await setSelected(selected_lang);
+        current_language.current = event.target.value;
     }
 
     function getLanguageOptions() {
@@ -149,7 +152,6 @@ export default function SoloQuestion(){
         langs.forEach((lang) => {
             languageOptions.push(<option key={lang.language} value={lang.language}>{lang.language}</option>);
         });
-        console.log("Language options: ", languageOptions);
         return languageOptions;
     }
 

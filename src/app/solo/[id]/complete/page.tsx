@@ -58,9 +58,7 @@ export default function Complete() {
     return (
         <div className={"h-screen w-screen ml-[200px]"}>
             <SideBar/>
-            PROBLEM SUCCESS!! {solutions.length}
             {getSolutions()}
-
         </div>
     );
 }
