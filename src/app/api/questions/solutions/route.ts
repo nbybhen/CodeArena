@@ -5,7 +5,7 @@ export async function GET(request: NextRequest) {
     try {
         let q_id = request.nextUrl.searchParams.get("q_id");
 
-        const {data, err} = await supabase.from("questions_completed").select().eq('q_id', q_id);
+        const {data, error} = await supabase.from("questions_completed").select().eq('q_id', q_id);
 
         return NextResponse.json({
             solutions: data,

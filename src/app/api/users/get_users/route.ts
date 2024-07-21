@@ -3,11 +3,11 @@ import supabase from "@/utils/supabase";
 
 export async function GET(){
     try {
-        const {data, err} = await supabase.from("users").select("id, username").limit(100);
+        const {data, error} = await supabase.from("users").select("id, username").limit(100);
 
-        if(err) {
-            console.log("Error! ", err);
-            return NextResponse.json({error: err.message, status: 400})
+        if(error) {
+            console.log("Error! ", error);
+            return NextResponse.json({error: error.message, status: 400})
         }
 
         return NextResponse.json({users: data});

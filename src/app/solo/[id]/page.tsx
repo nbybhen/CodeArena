@@ -159,7 +159,7 @@ export default function SoloQuestion(){
         <div className={"flex bg-primary"}>
             <Toaster position={"top-center"} />
             <SideBar/>
-            <div className={"flex flex-col mt-5 w-screen h-screen ml-[200px]"}>
+            <div className={"flex flex-col mt-5 w-screen h-screen"}>
                 <div className={"flex"}>
                     <div className={"flex flex-col w-3/4 mb-10"}>
                         <h5 className={"text-2xl font-bold ml-5"}>

@@ -4,10 +4,8 @@ import ArenaModeCard from "@/components/arena-mode-card";
 export default function Home() {
     return (
         <div className={"flex h-screen w-screen bg-primary"}>
-            <div className={"float-left"}>
-                <SideBar />
-            </div>
-            <div className={"flex flex-col items-center ml-[200px] m-2 w-screen"}>
+            <SideBar />
+            <div className={"flex flex-col items-center m-2 w-screen"}>
                 <h2 className={"text-2xl font-bold mt-10"}>Select an Arena:</h2>
                 <div className={"flex mt-3"}>
                     <div className={"mr-2"}>

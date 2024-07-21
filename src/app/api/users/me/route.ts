@@ -7,6 +7,14 @@ export async function GET(request: NextRequest) {
         const userID = await getDataFromToken(request);
         const {data, error} = await supabase.from('users').select("*").eq("id", userID);
 
+        if(error) {
+            console.log("Error getting ME: ", error.message);
+            return NextResponse.json({
+                error: error.message,
+                status: 400
+            });
+        }
+
         return NextResponse.json({
             message: "User found!",
             data: data

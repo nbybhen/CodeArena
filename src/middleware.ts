@@ -25,5 +25,5 @@ export function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-    matcher: ["/", "/login", "/ide", "/home", "/solo", "/clash", "/co-op", "/solo/:id"],
+    matcher: ["/", "/login", "/ide", "/home", "/solo", "/clash", "/co-op", "/solo/:id", "/settings", "/new-question", "/users"],
 };

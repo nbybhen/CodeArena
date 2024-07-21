@@ -56,9 +56,12 @@ export default function Complete() {
 
 
     return (
-        <div className={"h-screen w-screen ml-[200px]"}>
+        <div className={"h-screen"}>
             <SideBar/>
-            {getSolutions()}
+            <div className={"w-full flex flex-col"}>
+                {getSolutions()}
+            </div>
+
         </div>
     );
 }

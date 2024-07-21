@@ -148,7 +148,7 @@ func main() {
             <div className={"float-left"}>
                 <SideBar/>
             </div>
-            <div className={"flex ml-[200px] flex-col w-full justify-center"}>
+            <div className={"flex flex-col w-full justify-center"}>
                 <div className={"flex items-center justify-center h-12"}>
                     <div className={"text-lg font-bold"}>Language:</div>
                     <select className="text-lg m-2" value={selectedValue.name} onChange={handleChange} name="languages" id="languages">

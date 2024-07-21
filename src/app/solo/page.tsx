@@ -61,7 +61,7 @@ export default function Solo() {
     }, [search, language, diff]);
 
     return(
-        <div className={"flex ml-[200px] sticky"}>
+        <div className={"flex sticky"}>
             <SideBar/>
             <div className={"flex flex-col w-full"}>
                 <QuestionNav setSearch={setSearch} setLanguage={setLanguage} setDiff={setDiff} />
