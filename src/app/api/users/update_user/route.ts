@@ -8,8 +8,6 @@ export async function POST(request: NextRequest) {
         const formData = await request.formData();
         console.log("Form data: ", formData);
 
-
-
         const username: string = formData.get("username") as string;
         const email: string = formData.get("email") as string;
 

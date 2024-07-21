@@ -61,8 +61,6 @@ export default function Settings() {
             toast.error(e.message);
             console.log("Error updating user!", e.message);
         }
-
-
     }
 
     return(
@@ -70,12 +68,12 @@ export default function Settings() {
           <Toaster position={"top-center"} />
           <SideBar/>
           <div className={"flex bg-primary border-2 justify-center items-center  w-full"}>
-              <div className={"bg-secondary flex flex-col items-center border-2 border-gray-700 w-1/3 h-1/2"}>
+              <div className={"bg-secondary flex flex-col items-center border-2 border-gray-700 w-1/3"}>
                   <h1 className={"text-xl font-bold"}>Settings</h1>
-                  <div className={"flex w-full h-full border-2"}>
-                      <div className={"flex m-4 flex-col border-2 justify-evenly border-red-600 w-full"}>
+                  <div className={"flex w-full"}>
+                      <div className={"flex m-4 flex-col justify-evenly w-full"}>
                           <form>
-                              <div>
+                              <div className={"m-2"}>
                                   <label htmlFor="username" className="block text-lg font-medium text-gray-700 dark:text-gray-200">
                                       Username
                                   </label>
@@ -88,7 +86,7 @@ export default function Settings() {
                                   />
                               </div>
 
-                              <div>
+                              <div className={"m-2"}>
                                   <label htmlFor="email" className="block text-lg font-medium text-gray-700 dark:text-gray-200">Email</label>
                                   <input
                                       id={"email"}
@@ -99,7 +97,7 @@ export default function Settings() {
                                   />
                               </div>
 
-                              <div>
+                              <div className={"m-2"}>
                                   <label htmlFor="pfp" className="block mt-3 text-lg font-medium text-gray-700 dark:text-gray-200">
                                       Profile Picture
                                   </label>

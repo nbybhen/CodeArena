@@ -3,7 +3,7 @@ import supabase from "@/utils/supabase";
 
 export async function GET(){
     try {
-        const {data, error} = await supabase.from("users").select("id, username").limit(100);
+        const {data, error} = await supabase.from("users").select("id, username, ranking, img").limit(100);
 
         if(error) {
             console.log("Error! ", error);
