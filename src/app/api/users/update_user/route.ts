@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
             console.log("URL: ", "/" + file.name);
             const {data, error} = await supabase.from("users")
-                .update({username: username, email: email, img: "/" + file.name})
+                .update({username: username, email: email, img: file.name})
                 .eq('email', email)
                 .select();
 
