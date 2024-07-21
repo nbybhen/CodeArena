@@ -4,6 +4,8 @@
 
 tmp/*
 
+public/uploads/*
+
 
 ### macOS ###
 # General

@@ -77,9 +77,9 @@ export default function SideBar() {
 
     return (
         <header>
-        <div className="h-screen border-gray-700 flex flex-col max-w-[300px] border-2 px-3 py-4 bg-secondary">
+        <div className="h-screen border-gray-700 flex flex-col max-w-[250px] border-2 px-3 py-4 bg-secondary">
             <ul className="space-y-2 font-medium">
-                <li className={"font-bold border-2 flex flex-col items-center p-2 whitespace-pre-line text-cyan-500"}>
+                <li className={"font-bold border-2 flex flex-col justify-center text-center items-center p-2 whitespace-pre-line text-cyan-500"}>
                     <Image src={`/uploads${pfp}`} alt={"Profile Picture"} width={100} height={100} objectFit={"cover"} />
                     <p className={"text-xl w-full"}>{username}</p>
                     <p className={"text-med"}>{rank}</p>
