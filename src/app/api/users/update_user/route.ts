@@ -1,6 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
 import supabase from "@/utils/supabase";
 import * as fs from "node:fs";
+import sharp from "sharp";
 
 export async function POST(request: NextRequest) {
     try {
@@ -19,7 +20,9 @@ export async function POST(request: NextRequest) {
             const file = formData.get("file") as File;
 
             const arrayBuffer = await file.arrayBuffer();
-            const buffer = new Uint8Array(arrayBuffer);
+            //const buffer = new Uint8Array(arrayBuffer);
+
+            const buffer = await sharp(arrayBuffer).resize(120, 120).toBuffer();
 
             await fs.writeFile(`./public/uploads/${file.name}`, buffer, (err) => {
                 if(err) {
@@ -57,14 +60,6 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({error: error.message, status: 404});
             }
         }
-
-
-
-
-
-
-
-
     } catch (e) {
         return NextResponse.json({error: e.message, status: 404});
     }
