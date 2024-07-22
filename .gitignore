@@ -4,9 +4,6 @@
 
 tmp/*
 
-public/uploads/*
-
-
 ### macOS ###
 # General
 .DS_Store

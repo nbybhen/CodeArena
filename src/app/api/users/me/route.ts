@@ -4,20 +4,11 @@ import supabase from "@/utils/supabase";
 
 export async function GET(request: NextRequest) {
     try {
-        const userID = await getDataFromToken(request);
-        const {data, error} = await supabase.from('users').select("*").eq("id", userID);
-
-        if(error) {
-            console.log("Error getting ME: ", error.message);
-            return NextResponse.json({
-                error: error.message,
-                status: 400
-            });
-        }
+        const user = getDataFromToken(request);
 
         return NextResponse.json({
             message: "User found!",
-            data: data
+            user: user
         });
     } catch (err: any) {
         console.log("Couldn't find user!");

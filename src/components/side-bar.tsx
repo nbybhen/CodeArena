@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import {useRouter} from "next/navigation";
 import {useEffect, useState} from "react";
 import Image from "next/image";
+import {getDataFromToken} from "@/helpers/getDataFromToken";
 
 interface User {
     id: number,
@@ -26,7 +27,6 @@ export default function SideBar() {
 
     const router = useRouter();
 
-
     useEffect(() => {
         // An attempt at fixing error where site is re-hosted and token remains since it was logged in previously,
         // but no data is contained within it 
@@ -34,13 +34,15 @@ export default function SideBar() {
             try {
                 const response = await axios.get("/api/users/me");
 
-                if(response.data.data) {
-                    let me: User = response.data.data[0];
+                console.log("RESPONSE: ", response.data.user);
+
+                if(response.data.user) {
+                    let me: User = response.data.user;
                     console.log("Me! ", me);
                     setUsername(me.username);
-                    setScore(response.data.data[0].score);
-                    setRank(response.data.data[0].ranking);
-                    setPfp(response.data.data[0].img);
+                    setScore(me.score);
+                    setRank(me.ranking);
+                    setPfp(me.img);
                 }
                 else {
                     console.log("Error! ");
@@ -80,10 +82,10 @@ export default function SideBar() {
         <div className="h-screen border-gray-700 flex flex-col max-w-[250px] border-2 px-3 py-4 bg-secondary">
             <ul className="space-y-2 font-medium">
                 <li className={"font-bold border-2 flex flex-col justify-center text-center items-center p-2 whitespace-pre-line text-cyan-500"}>
-                    <Image src={`/uploads/${pfp}`} alt={"Profile Picture"} width={100} height={100} objectFit={"cover"} />
-                    <p className={"text-xl w-full"}>{username}</p>
-                    <p className={"text-med"}>{rank}</p>
-                    <p className={"text-l pr-1"}>[{score}]</p>
+                    <Image src={`/uploads/${window.localStorage.getItem("img")}`} alt={"Profile Picture"} width={100} height={100} objectFit={"cover"} />
+                    <p className={"text-xl w-full"}>{window.localStorage.getItem("username")}</p>
+                    <p className={"text-med"}>{window.localStorage.getItem("ranking")}</p>
+                    <p className={"text-l pr-1"}>[{window.localStorage.getItem("score")}]</p>
                 </li>
 
                 <li className={"border-t dark:border-gray-700 mt-4 pt-4"}>

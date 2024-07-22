@@ -18,7 +18,14 @@ export default function Login() {
         setIsLoading(true);
         try {
             const response = await axios.post("/api/users/login", user);
+            window.localStorage.setItem("username", response.data.username);
+            window.localStorage.setItem("ranking", response.data.ranking);
+            window.localStorage.setItem("score", response.data.score);
+            window.localStorage.setItem("img", response.data.img);
+
+
             console.log("Login success!", response.data);
+
             router.push("/home");
         } catch (err: any) {
             console.log("Error signing in:", err.response.data.error);

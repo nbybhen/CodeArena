@@ -26,7 +26,7 @@ export default function Settings() {
     async function getData() {
         let response = await axios.get("/api/users/me");
 
-        let user: User = response.data.data[0];
+        let user: User = response.data.user;
         console.log("User: ", user);
 
         setUsername(user.username);
@@ -34,7 +34,6 @@ export default function Settings() {
     }
     useEffect(() => {
         getData();
-
     }, []);
 
     async function handleClick(event: any) {

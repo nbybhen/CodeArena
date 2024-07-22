@@ -7,17 +7,14 @@ export async function POST(request: NextRequest) {
     try {
         const reqBody = await request.json();
         const { email, password } = reqBody;
-        console.log("reqBody:", reqBody);
 
         // Check if user exists
         const {data, error} = await supabase.from('users').select('*').eq('email', email);
-        console.log("User: ", data);
 
-        if (!data) {
-            return NextResponse.json({ error: "User does not exist.", status: 400 });
+        if (error) {
+            return NextResponse.json({ error: error.message, status: 400 });
         }
 
-    
         if (!(password === data[0].password)) {
             return NextResponse.json({ error: "Incorrect password.", status: 400 });
         }
@@ -31,7 +28,14 @@ export async function POST(request: NextRequest) {
 
         const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, { expiresIn: "1hr" });
 
-        const response = NextResponse.json({ message: "Login successful.", success: true });
+        const response = NextResponse.json({
+            message: "Login successful.",
+            success: true,
+            username: data[0].username,
+            ranking: data[0].ranking,
+            score: data[0].score,
+            img: data[0].img
+        });
 
         //@ts-ignore
         response.cookies.set("token", token, {

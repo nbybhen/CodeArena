@@ -1,9 +1,11 @@
-import {NextResponse} from "next/server";
+import {NextRequest, NextResponse} from "next/server";
 import supabase from "@/utils/supabase";
 
-export async function GET(){
+export async function GET(request: NextRequest){
     try {
-        const {data, error} = await supabase.from("users").select("id, username, ranking, img").limit(100);
+        const {data, error} = await supabase.from("users")
+            .select("id, username, ranking, img")
+            .limit(100);
 
         if(error) {
             console.log("Error! ", error);
