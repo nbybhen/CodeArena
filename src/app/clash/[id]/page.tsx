@@ -7,6 +7,7 @@ import {usePathname, useRouter} from "next/navigation";
 import {io} from "socket.io-client";
 import stripAnsi from "strip-ansi";
 import {Editor} from "@monaco-editor/react";
+import {User} from "@supabase/auth-js";
 
 interface Question {
     id: string,
@@ -26,8 +27,18 @@ interface Lang {
     solution: string,
 }
 
+interface Opponent {
+    id: string,
+    username: string,
+    ranking: string,
+    score: number,
+    status: string
+}
+
 export default function ClashIde() {
+
     const pathname = usePathname();
+    const id = pathname.split('/').at(-1);
     const router = useRouter();
 
     const [langs, setLangs] = useState<Lang[]>([]);
@@ -41,9 +52,10 @@ export default function ClashIde() {
     });
     let [output, setOutput] = useState<string>("");
     const [selected, setSelected] = useState<Lang>({solution: "", test: "", id: 0, language: "", q_id: "", starter: ""});
+    const [opponent, setOpponent] = useState<Opponent>(null);
+    let newOpponent = opponent;
 
-    let editorRef = useRef(null);
-    let testingRef = useRef(null);
+        let editorRef = useRef(null);
     let socket = useRef(null);
     let current_language = useRef<string | null>(null);
 
@@ -51,18 +63,15 @@ export default function ClashIde() {
         const id = pathname.split('/').at(-1);
         console.log("Route: ", id);
 
+
         async function getQuestionData() {
             try{
                 const response = await axios.post("/api/questions/get_question", {id: id});
-                console.log("Question data: ", response.data.question_data);
                 setQuestion(response.data.question_data);
 
                 setLangs([]);
 
-                console.log("Question langs: ", response.data.question_langs);
-
                 response.data.question_langs.forEach((dbl: Lang) => {
-                    console.log("Lang: ", dbl);
                     setLangs(oldLangs => [...oldLangs, dbl])
                 });
                 setSelected(response.data.question_langs[0]);
@@ -79,13 +88,11 @@ export default function ClashIde() {
         async function connect() {
             //@ts-ignore
             socket.current = io("ws://localhost:4000");
-            console.log("TRANSFERRING USERNAME OF ", window.localStorage.getItem("username"));
         }
 
         async function solveQuestion() {
             try {
                 await axios.post("/api/questions/solve_question", {q_id: id, solution: editorRef.current.getValue(), language: current_language.current});
-
             } catch (e) {
                 console.log("Error solving question: ", e.message);
             }
@@ -95,12 +102,27 @@ export default function ClashIde() {
 
         socket.current.on("match-response", (event: any) => {
             console.log("MATCH RESPONSE: ", event);
-            let opponent = JSON.parse(event.opponent);
-            console.log("OPPONENT: ", opponent);
+            let tmp: Opponent = JSON.parse(event.opponent);
+
+            console.log("TMP: ", tmp);
+            // Ensures that you won't see yourself as an opponent
+            if(tmp.username != window.localStorage.getItem("username")) {
+                setOpponent(tmp);
+                newOpponent = tmp;
+            }
+            console.log("CURRENT OPPONENT: ", opponent);
         });
 
         socket.current.on("return", (msg: any) => {
-            console.log("Server said: ", msg);
+            console.log(msg);
+        });
+
+        socket.current.on("status-return", (response: Opponent) => {
+            console.log("STATUS RETURN RESPONSE: ", response);
+            if(response.username != window.localStorage.getItem("username")) {
+                setOpponent(response);
+                newOpponent = response;
+            }
         });
 
         socket.current.on("response", (event: any) => {
@@ -115,10 +137,13 @@ export default function ClashIde() {
                 console.log("Exit code: ", msg.code)
                 if(msg.code === 0) {
                     console.log("FINISHED QUESTION!");
+                    console.log("OPPONENT: ", newOpponent);
+                    socket.current.emit("change-status", newOpponent.username, "Complete");
+                    console.log("OPPONENT AFTER: ", newOpponent);
                     toast.success("Question Completed!");
                     solveQuestion();
                     setTimeout(() => {
-                        router.push(`/solo/${id}/complete`);
+                        router.push(`/clash/${id}/complete`);
                     }, 1000);
                     return;
                 }
@@ -135,14 +160,24 @@ export default function ClashIde() {
 
     }, [current_language]);
 
-    function handleClick() {
-        console.log("Button clicked!");
-        current_language.current = selected.language;
-        console.log("Editor: ",editorRef.current.getValue());
-        console.log("Testing Editor: ", testingRef.current.getValue());
-        let agg = selected.solution + "\n" + editorRef.current.getValue() + "\n" + testingRef.current.getValue();
-        console.log("Aggregated code: ",agg);
-        socket.current.emit("message", { lang: selected.language, code: agg, ide: false });
+    async function handleClick() {
+        try {
+            console.log("Button clicked!");
+            current_language.current = selected.language;
+            console.log("Editor: ",editorRef.current.getValue());
+            let response = await axios.get("/api/questions/get_solution", {
+                params: {
+                    q_id: id,
+                    lang: selected.language
+                }
+            });
+
+            let agg = selected.solution + "\n" + editorRef.current.getValue() + "\n" + response.data.data[0].test;
+            console.log("Aggregated code: ",agg);
+            socket.current.emit("message", { lang: selected.language, code: agg, ide: false });
+        } catch (e) {
+            console.log("ERRORRRRRR: ", e);
+        }
     }
 
     async function handleLanguageChange(event) {
@@ -191,12 +226,19 @@ export default function ClashIde() {
                 </div>
 
                 <div className={"flex justify-evenly"}>
-                    <div>
+                    <div className={"border-2 flex flex-col border-red-600"}>
                         <div className={"bg-black border-2 overflow-y-auto h-[50vh] w-[40vw] break-words whitespace-pre-wrap"}>
                             <p className={"border-b text-center text-xl"}>Output</p>
                             {output}
                         </div>
-                        <Editor height={"30vh"} width={"40vw"} options={{ fontSize: 14, minimap: { enabled: false} }} language={selected.language} value={selected.test} onMount={(e: any) => testingRef.current = e} theme={"vs-dark"} />
+                        <div className={"bg-secondary flex flex-col items-center border-green-500 p-2 border-2"}>
+                            <p className={"text-2xl mb-2"}>Opponent</p>
+                            <div className={"flex w-full mb-2 justify-evenly"}>
+                                <p className={"text-xl"}>{opponent ? opponent.username : "[username]"}</p>
+                                <p className={"text-xl"}>{opponent ? opponent.status : "[status]"}</p>
+                            </div>
+
+                        </div>
                     </div>
                     <Editor height={"80vh"} width={"40vw"} options={{ fontSize: 14 }} language={selected.language} value={selected.starter} onMount={(e: any) => editorRef.current = e} theme={"vs-dark"} />
                 </div>

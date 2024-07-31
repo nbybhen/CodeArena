@@ -24,11 +24,7 @@ export default function Users() {
         async function getUsers() {
             setUsers([]);
 
-            let response = await axios.get("/api/users/get_users", {
-                params: {
-                    
-                }
-            });
+            let response = await axios.get("/api/users/get_users");
             console.log("Response: ", response.data.users);
 
             response.data.users.forEach((user: User) => {

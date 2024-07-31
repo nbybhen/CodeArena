@@ -12,10 +12,11 @@ interface Solution {
 
 export async function POST(request: NextRequest) {
     try {
-        const user_id = await getDataFromToken(request);
+        let user_id = await getDataFromToken(request);
+        user_id = user_id.id;
         const reqBody = await request.json();
         const {q_id, solution, language} = reqBody;
-        console.log("")
+        console.log("USER_ID", user_id);
 
         const solved = await supabase.from("questions_completed").select().eq("user_id", user_id);
 
@@ -39,8 +40,6 @@ export async function POST(request: NextRequest) {
 
         console.log("UUID: ", q_id);
 
-        //const {err} = await supabase.from("questions_completed").insert({user_id: 20, q_id: "TESTING", solution: "TESTING", language: "TEST"});
-
         const {data, error} = await supabase.from("questions_completed").insert({user_id: user_id, q_id: q_id, solution: solution, language: language }).select();
 
         if(error) {
@@ -56,7 +55,7 @@ export async function POST(request: NextRequest) {
         });
 
     } catch(e) {
-        NextResponse.json({
+        return NextResponse.json({
            error: e.message,
            status: 400
         });

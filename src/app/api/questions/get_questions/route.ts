@@ -1,7 +1,7 @@
 import supabase from "@/utils/supabase";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     try {
         const users = await supabase.from("users").select().limit(100);
 

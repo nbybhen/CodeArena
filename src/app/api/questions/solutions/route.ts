@@ -4,6 +4,7 @@ import supabase from "@/utils/supabase";
 export async function GET(request: NextRequest) {
     try {
         let q_id = request.nextUrl.searchParams.get("q_id");
+        console.log("Q_ID: ", q_id);
 
         const {data, error} = await supabase.from("questions_completed").select().eq('q_id', q_id);
 
