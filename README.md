@@ -10,10 +10,12 @@ yarn install
 
 # Hosts website locally
 yarn run dev
-
-# Hosts server locally
-./node_modules/.bin/tsx server/server.ts
 ```
+
+Currently the TS server is being transferred over to [a Rust implementation](https://github.com/nbybhen/rust-ws), and so it may not work properly. 
+Clone the `rust-ws` repository and run `cargo run` in order to start up the CodeArena server.
+
+**Note: You must have cargo installed on your machine in order to run the server.**
 
 [//]: # (In order to run code within the editor, you can either run the server locally with `tsx server/server.ts`, or you can run the `Dockerfile` with the below instructions:)
 
