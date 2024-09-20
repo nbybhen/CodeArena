@@ -125,11 +125,10 @@ export default function ClashIde() {
             }
         });
 
-        socket.current.on("response", (event: any) => {
+        socket.current.on("response", (msg: any) => {
             console.log("TERMINAL PROCESSED!", event);
 
             try {
-                let msg = JSON.parse(event);
                 console.log("Parsed message!", msg.output);
                 if (!msg.output.endsWith("\n")) {
                     msg.output += "\r\n";
@@ -150,7 +149,7 @@ export default function ClashIde() {
                 setOutput(stripAnsi(msg.output));
                 console.log("New output: ",output);
             } catch (err) {
-                console.log("Malformed message from terminal: ", event.data);
+                console.log("Malformed message from terminal: ", msg);
                 console.log(err);
                 return;
             }

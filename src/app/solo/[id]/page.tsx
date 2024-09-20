@@ -96,17 +96,16 @@ export default function SoloQuestion(){
             console.log("Server said: ", msg);
         });
 
-        socket.current.on("response", (event: any) => {
-            console.log("TERMINAL PROCESSED!", event);
+        socket.current.on("response", (msg: string) => {
+            console.log("TERMINAL PROCESSED!", msg);
 
             try {
-                let msg = JSON.parse(event);
-                console.log("Parsed message!", msg.output);
-                if (!msg.output.endsWith("\n")) {
-                    msg.output += "\r\n";
+                console.log("Parsed message!", msg);
+                if (!msg.endsWith("\n")) {
+                    msg += "\r\n";
                 }
-                console.log("Exit code: ", msg.code)
-                if(msg.code === 0) {
+                //console.log("Exit code: ", msg)
+                if(msg === 0) {
                     console.log("FINISHED QUESTION!");
                     toast.success("Question Completed!");
                     solveQuestion();
@@ -115,10 +114,10 @@ export default function SoloQuestion(){
                     }, 1000);
                     return;
                 }
-                setOutput(stripAnsi(msg.output));
+                setOutput(stripAnsi(msg));
                 console.log("New output: ",output);
             } catch (err) {
-                console.log("Malformed message from terminal: ", event.data);
+                console.log("Malformed message from terminal: ", msg);
                 console.log(err);
                 return;
             }

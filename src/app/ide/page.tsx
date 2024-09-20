@@ -29,20 +29,19 @@ export default function Dashboard() {
             console.log("Server said: ", msg);
         });
 
-        socket.current.on("response", (event: any) => {
-            console.log("TERMINAL PROCESSED!", event);
+        socket.current.on("response", (msg: any) => {
 
             try {
-                let msg = JSON.parse(event);
-                console.log("Parsed message!", msg.output);
+                console.log("Parsed message!", msg);
                 xTermRef.current.terminal.clear();
+                xTermRef.current.terminal.reset();
                 console.log(`Terminal Data: ${xTermRef.current.terminal}`);
-                if (!msg.output.endsWith("\n")) {
-                    msg.output += "\r\n";
+                if (!msg.endsWith("\n")) {
+                    msg += "\r\n";
                 }
-                xTermRef.current.terminal.write(msg.output);
+                xTermRef.current.terminal.write(msg);
             } catch (err) {
-                console.log("Malformed message from terminal: ", event.data);
+                console.log("Malformed message from terminal: ", msg);
                 console.log(err);
                 return;
             }
@@ -50,9 +49,6 @@ export default function Dashboard() {
 
         // Statically sets the terminal size on mount (col, row)
         xTermRef.current.terminal.resize(75, 40);
-
-        // console.log("Input: ", input);
-        // console.log("input charcode: ", input.charCodeAt(0));
     }, [input, xTermRef, socket]);
 
     function handleChange(event: any) {
