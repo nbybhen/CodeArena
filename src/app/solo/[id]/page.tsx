@@ -96,16 +96,16 @@ export default function SoloQuestion(){
             console.log("Server said: ", msg);
         });
 
-        socket.current.on("response", (msg: string) => {
+        socket.current.on("response", (msg: {data: string, code: number}) => {
             console.log("TERMINAL PROCESSED!", msg);
 
             try {
                 console.log("Parsed message!", msg);
-                if (!msg.endsWith("\n")) {
-                    msg += "\r\n";
+                if (!msg.data.endsWith("\n")) {
+                    msg.data += "\r\n";
                 }
                 //console.log("Exit code: ", msg)
-                if(msg === 0) {
+                if(msg.code === 0) {
                     console.log("FINISHED QUESTION!");
                     toast.success("Question Completed!");
                     solveQuestion();
@@ -114,7 +114,7 @@ export default function SoloQuestion(){
                     }, 1000);
                     return;
                 }
-                setOutput(stripAnsi(msg));
+                setOutput(stripAnsi(msg.data));
                 console.log("New output: ",output);
             } catch (err) {
                 console.log("Malformed message from terminal: ", msg);
@@ -132,7 +132,7 @@ export default function SoloQuestion(){
         console.log("Testing Editor: ", testingRef.current.getValue());
         let agg = selected.solution + "\n" + editorRef.current.getValue() + "\n" + testingRef.current.getValue();
         console.log("Aggregated code: ",agg);
-        socket.current.emit("message", { lang: selected.language, code: agg, ide: false });
+        socket.current.emit("message", { lang: selected.language, code: agg, is_ide: false });
     }
 
     async function handleLanguageChange(event) {

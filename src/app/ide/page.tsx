@@ -136,7 +136,7 @@ func main() {
 
     function handleClick() {
         console.log("Button clicked!");
-        socket.current.emit("message", { lang: selectedValue.name, code: editorRef.current.getValue() });
+        socket.current.emit("message", { xlang: selectedValue.name, code: editorRef.current.getValue(), is_ide: true });
     }
 
     return (
