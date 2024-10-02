@@ -30,19 +30,21 @@ export default function Dashboard() {
         });
 
         socket.current.on("response", (msg: any) => {
-
             try {
                 console.log("Parsed message!", msg);
-                xTermRef.current.terminal.clear();
                 xTermRef.current.terminal.reset();
+
                 console.log(`Terminal Data: ${xTermRef.current.terminal}`);
-                if (!msg.endsWith("\n")) {
-                    msg += "\r\n";
-                }
+
+                // Replaces all newlines with carrier return
+                // in order "reset" tabbing across multiple lines
+                msg = msg.replaceAll("\n", "\n\r");
+                console.log("Msg: ", JSON.stringify(msg));
+
                 xTermRef.current.terminal.write(msg);
             } catch (err) {
                 console.log("Malformed message from terminal: ", msg);
-                console.log(err);
+                console.log("Error: ", err);
                 return;
             }
         });
